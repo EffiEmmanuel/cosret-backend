@@ -6,7 +6,9 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import { connectDB } from "./lib/db.js";
 import userRouter from "./routers/userRouter.js";
-import engineerRouter from "./routers/engineerRouter.js";
+import engineerRouter from "./routers/EngineerRouter.js";
+import adminRouter from "./routers/AdminRouter.js";
+import projectRouter from "./routers/ProjectRouter.js";
 dotenv.config();
 
 // Routers
@@ -23,7 +25,9 @@ app.use(json());
 
 // Routes
 app.use("/api/users", userRouter);
-app.use("/api/engineers", userRouter);
+app.use("/api/engineers", engineerRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/projects", projectRouter);
 
 // Creating the server
 const server = http.createServer(app);

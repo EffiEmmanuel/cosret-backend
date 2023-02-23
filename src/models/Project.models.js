@@ -10,6 +10,10 @@ const Project = new mongoose.Schema(
       type: String,
       required: true,
     },
+    slug: {
+      type: String,
+      required: true,
+    },
     owner: {
       type: mongoose.Types.ObjectId,
       ref: "User",
