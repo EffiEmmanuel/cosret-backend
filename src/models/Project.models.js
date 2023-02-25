@@ -17,6 +17,11 @@ const Project = new mongoose.Schema(
     owner: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    uniqueId: {
+      type: String,
+      required: true,
     },
     engineerAssigned: {
       type: mongoose.Types.ObjectId,

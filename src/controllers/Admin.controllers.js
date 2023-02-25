@@ -10,7 +10,7 @@ export const createAdmin = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!email || !username || !password) {
-    return req
+    return res
       .status(409)
       .json({ message: "Please fill in the missing fields!" });
   }
@@ -83,7 +83,7 @@ export const getAdminById = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!adminId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A admin id must be provided to perform this operation.",
     });
   }
@@ -94,7 +94,7 @@ export const getAdminById = async (req, res) => {
 
     //   Validate field for empty strings / null values
     if (!admin) {
-      return req.status(404).json({
+      return res.status(404).json({
         message: `admin with id (${adminId}) does not exist.`,
       });
     }
@@ -116,18 +116,18 @@ export const getAdminByUsername = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!username) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A username must be provided to perform this operation.",
     });
   }
 
   try {
     // Query database for all admins
-    const admin = await AdminModel.findOne({ username }).populate("projects");
+    const admin = await AdminModel.findOne({ username });
 
     //   Validate field for empty strings / null values
     if (!admin) {
-      return req.status(404).json({
+      return res.status(404).json({
         message: `Admin with username (${username}) does not exist.`,
       });
     }
@@ -149,7 +149,7 @@ export const updateAdminUsername = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!adminId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A admin id must be provided to perform this operation.",
     });
   }
@@ -157,12 +157,12 @@ export const updateAdminUsername = async (req, res) => {
   try {
     // Check if any admin with the provided admin id exists
     let admin = await AdminModel.findOneAndUpdate(
-      { _id: userId },
+      { _id: adminId },
       { ...req.body }
     );
-    if (!user) {
+    if (!admin) {
       return res.status(404).json({
-        message: `Invalid operation. This user does not exist!`,
+        message: `Invalid operation. This admin does not exist!`,
       });
     }
 
@@ -188,7 +188,7 @@ export const deleteAdminAccount = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!adminId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A admin id must be provided to perform this operation.",
     });
   }
@@ -219,6 +219,13 @@ export const deleteAdminAccount = async (req, res) => {
 export const loginAdmin = async (req, res) => {
   // Get login credentials
   const { username, password } = req.body;
+
+  //   Validate field for empty strings / null values
+  if (!username || !password) {
+    return res.status(409).json({
+      message: "Please fill in the missing fields.",
+    });
+  }
 
   console.log("OVER HERE:", req.body);
   try {

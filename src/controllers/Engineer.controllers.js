@@ -9,7 +9,7 @@ export const createEngineer = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!firstName || !lastName || !email || !password) {
-    return req
+    return res
       .status(409)
       .json({ message: "Please fill in the missing fields!" });
   }
@@ -73,7 +73,7 @@ export const getEngineerById = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!engineerId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A engineer id must be provided to perform this operation.",
     });
   }
@@ -86,7 +86,7 @@ export const getEngineerById = async (req, res) => {
 
     //   Validate field for empty strings / null values
     if (!engineer) {
-      return req.status(404).json({
+      return res.status(404).json({
         message: `Engineer with id (${engineerId}) does not exist.`,
       });
     }
@@ -108,7 +108,7 @@ export const getEngineerByEmail = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!engineerEmail) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A engineer email must be provided to perform this operation.",
     });
   }
@@ -121,7 +121,7 @@ export const getEngineerByEmail = async (req, res) => {
 
     //   Validate field for empty strings / null values
     if (!engineer) {
-      return req.status(404).json({
+      return res.status(404).json({
         message: `Engineer with email (${engineerEmail}) does not exist.`,
       });
     }
@@ -143,7 +143,7 @@ export const updateEngineer = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!engineerId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A engineer id must be provided to perform this operation.",
     });
   }
@@ -182,7 +182,7 @@ export const deleteEngineer = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!engineerId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A engineer id must be provided to perform this operation.",
     });
   }
@@ -213,6 +213,13 @@ export const deleteEngineer = async (req, res) => {
 export const loginEngineer = async (req, res) => {
   // Get login credentials
   const { email, password } = req.body;
+
+  //   Validate field for empty strings / null values
+  if (!email || !password) {
+    return res.status(409).json({
+      message: "Please fill in the missing fields.",
+    });
+  }
 
   try {
     const engineerExists = await EngineerModel.findOne({ email });

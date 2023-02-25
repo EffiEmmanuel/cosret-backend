@@ -22,11 +22,13 @@ const User = new mongoose.Schema(
       type: String,
       required: true,
     },
-    projects: {
-      type: mongoose.Types.ObjectId,
-      ref: "Project",
-      required: false,
-    },
+    projects: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Project",
+        required: false,
+      },
+    ],
   },
   { timestamps: true }
 );

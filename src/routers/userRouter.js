@@ -8,6 +8,7 @@ import {
   getUsers,
   loginUser,
   updateUser,
+  verifyToken,
 } from "../controllers/User.controllers.js";
 const userRouter = express.Router();
 
@@ -19,6 +20,7 @@ userRouter
   .put(updateUser);
 
 userRouter.post("/login", loginUser);
+userRouter.post("/verifyToken", verifyToken);
 userRouter.get("/email/:userEmail", getUserByEmail);
 userRouter.get("/username/:username", getUserByUsername);
 

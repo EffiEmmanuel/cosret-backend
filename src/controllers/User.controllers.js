@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { jwtSign } from "../helpers/auth.js";
+import { jwtSign, jwtVerify } from "../helpers/auth.js";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
 import UserModel from "../models/user.models.js";
 
@@ -10,7 +10,7 @@ export const createUser = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!firstName || !lastName || !username || !email || !password) {
-    return req
+    return res
       .status(409)
       .json({ message: "Please fill in the missing fields!" });
   }
@@ -91,7 +91,7 @@ export const getUserById = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!userId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A user id must be provided to perform this operation.",
     });
   }
@@ -124,7 +124,7 @@ export const getUserByEmail = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!userEmail) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A user email must be provided to perform this operation.",
     });
   }
@@ -159,7 +159,7 @@ export const getUserByUsername = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!username) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A username must be provided to perform this operation.",
     });
   }
@@ -192,7 +192,7 @@ export const updateUser = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!userId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A user id must be provided to perform this operation.",
     });
   }
@@ -231,7 +231,7 @@ export const deleteUser = async (req, res) => {
 
   //   Validate field for empty strings / null values
   if (!userId) {
-    return req.status(409).json({
+    return res.status(409).json({
       message: "A user id must be provided to perform this operation.",
     });
   }
@@ -262,6 +262,13 @@ export const deleteUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   // Get login credentials
   const { email, password } = req.body;
+
+  //   Validate field for empty strings / null values
+  if (!email || !password) {
+    return res.status(409).json({
+      message: "Please fill in the missing fields.",
+    });
+  }
 
   console.log("OVER HERE:", req.body);
   try {
@@ -294,5 +301,22 @@ export const loginUser = async (req, res) => {
         "An error occured while we processed your request, please try again",
       data: error,
     });
+  }
+};
+
+export const verifyToken = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(409).json({ message: "A token must be provided." });
+  }
+
+  const isValid = jwtVerify(token);
+  console.log("ISVALID:", isValid);
+  if (Math.floor(new Date().getTime() / 1000) >= isValid.exp * 100) {
+    return res.status(403).json({ message: "Session expired! Please log in." });
+  } else {
+    return res
+      .status(200)
+      .json({ message: "Token still valid.", data: isValid.userExists });
   }
 };

@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const Admin = new mongoose.Schema(
   {
+    email: {
+      type: String,
+      required: true,
+    },
     username: {
       type: String,
       required: true,

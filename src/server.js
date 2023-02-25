@@ -9,6 +9,8 @@ import userRouter from "./routers/userRouter.js";
 import engineerRouter from "./routers/EngineerRouter.js";
 import adminRouter from "./routers/AdminRouter.js";
 import projectRouter from "./routers/ProjectRouter.js";
+import userRequirementRouter from "./routers/UserRequirementRouter.js";
+import systemRequirementRouter from "./routers/SystemRequirementRouter.js";
 dotenv.config();
 
 // Routers
@@ -28,6 +30,8 @@ app.use("/api/users", userRouter);
 app.use("/api/engineers", engineerRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/projects", projectRouter);
+app.use("/api/user-requirements", userRequirementRouter);
+app.use("/api/system-requirements", systemRequirementRouter);
 
 // Creating the server
 const server = http.createServer(app);

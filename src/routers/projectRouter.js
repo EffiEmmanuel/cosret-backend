@@ -18,6 +18,6 @@ projectRouter
 
 projectRouter.get("/user/:userId", getUserProjects);
 projectRouter.get("/:projectId", getProjectById);
-projectRouter.get("/:slug", getProjectBySlug);
+projectRouter.get("/slug/:slug", getProjectBySlug);
 
 export default projectRouter;

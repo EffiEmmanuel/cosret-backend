@@ -10,6 +10,10 @@ const SystemRequirement = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Engineer",
     },
+    userRequirement: {
+      type: mongoose.Types.ObjectId,
+      ref: "UserRequirement",
+    },
     project: {
       type: mongoose.Types.ObjectId,
       ref: "Project",
