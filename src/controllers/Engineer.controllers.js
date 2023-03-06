@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { jwtSign } from "../helpers/auth.js";
+import { jwtSign, jwtVerify } from "../helpers/auth.js";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
 import EngineerModel from "../models/Engineer.models.js";
 
@@ -30,7 +30,6 @@ export const createEngineer = async (req, res) => {
     const engineer = new EngineerModel({
       firstName,
       lastName,
-      username,
       email,
       password: hashedPassword,
     });
@@ -44,6 +43,7 @@ export const createEngineer = async (req, res) => {
       data: engineer,
     });
   } catch (error) {
+    console.log("ERROR:", error);
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
@@ -55,14 +55,16 @@ export const createEngineer = async (req, res) => {
 export const getEngineers = async (req, res) => {
   try {
     // Query database for all engineers
-    const engineers = await EngineerModel.find().populate("projects");
+    const engineers = await EngineerModel.find()
+      .populate("projectsAssignedTo")
+      .populate("chatRooms");
     // Return success message with all engineers
     res.status(200).json({ message: "Fetched all engineers", data: engineers });
   } catch (error) {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      data: null,
+      error: error,
     });
   }
 };
@@ -80,9 +82,9 @@ export const getEngineerById = async (req, res) => {
 
   try {
     // Query database for all engineers
-    const engineer = await EngineerModel.findById(engineerId).populate(
-      "projects"
-    );
+    const engineer = await EngineerModel.findById(engineerId)
+      .populate("projectsAssignedTo")
+      .populate("chatRooms");
 
     //   Validate field for empty strings / null values
     if (!engineer) {
@@ -214,6 +216,8 @@ export const loginEngineer = async (req, res) => {
   // Get login credentials
   const { email, password } = req.body;
 
+  console.log("REQ.BODY:", req.body);
+
   //   Validate field for empty strings / null values
   if (!email || !password) {
     return res.status(409).json({
@@ -228,6 +232,8 @@ export const loginEngineer = async (req, res) => {
         .status(404)
         .json({ message: `No account with email (${email}) exists.` });
     }
+
+    console.log("ENGINEER EXISTS:", engineerExists);
 
     const isPasswordCorrect = comparePassword(
       password,
@@ -250,5 +256,25 @@ export const loginEngineer = async (req, res) => {
         "An error occured while we processed your request, please try again",
       data: error,
     });
+  }
+};
+
+export const verifyToken = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(409).json({ message: "A token must be provided." });
+  }
+
+  const isValid = jwtVerify(token);
+  console.log("ISVALID:", isValid);
+  if (Math.floor(new Date().getTime() / 1000) >= isValid.exp * 100) {
+    return res.status(403).json({
+      message: "Session expired! Please log in.",
+      data: isValid.engineerExists,
+    });
+  } else {
+    return res
+      .status(200)
+      .json({ message: "Token still valid.", data: isValid.engineerExists });
   }
 };

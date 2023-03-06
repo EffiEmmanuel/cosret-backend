@@ -13,8 +13,6 @@ import userRequirementRouter from "./routers/UserRequirementRouter.js";
 import systemRequirementRouter from "./routers/SystemRequirementRouter.js";
 dotenv.config();
 
-// Routers
-
 const app = express();
 
 // Connect to database

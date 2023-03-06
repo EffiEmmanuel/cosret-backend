@@ -7,6 +7,7 @@ import {
   getEngineers,
   loginEngineer,
   updateEngineer,
+  verifyToken,
 } from "../controllers/Engineer.controllers.js";
 const engineerRouter = express.Router();
 
@@ -19,5 +20,6 @@ engineerRouter
 
 engineerRouter.post("/login", loginEngineer);
 engineerRouter.get("/email/:userEmail", getEngineerByEmail);
+engineerRouter.post("/verifyToken", verifyToken);
 
 export default engineerRouter;

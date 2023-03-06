@@ -98,7 +98,12 @@ export const getUserById = async (req, res) => {
 
   try {
     // Query database for all users
-    const user = await UserModel.findById(userId).populate("projects");
+    const user = await UserModel.findById(userId).populate({
+      path: "projects",
+      options: {
+        sort: { createdAt: -1 },
+      },
+    });
 
     //   Validate field for empty strings / null values
     if (!user) {

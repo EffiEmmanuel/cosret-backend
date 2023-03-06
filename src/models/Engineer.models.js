@@ -18,6 +18,12 @@ const Engineer = new mongoose.Schema(
       type: String,
       required: true,
     },
+    chatRooms: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "ChatRoom",
+      },
+    ],
     projectsAssignedTo: [
       {
         type: mongoose.Types.ObjectId,

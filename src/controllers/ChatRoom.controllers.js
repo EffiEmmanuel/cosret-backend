@@ -7,71 +7,73 @@ import EngineerModel from "../models/Engineer.models.js";
 import ProjectModel from "../models/Project.models.js";
 import UserModel from "../models/user.models.js";
 
-export const createAdmin = async (req, res) => {
-  console.log("REQ.BODY:", req.body);
-  // Get all fields from the request body
-  const { email, username, password } = req.body;
+// export const createChatRoom = async (req, res) => {
+//   console.log("REQ.BODY:", req.body);
+//   // Get all fields from the request body
+//   const { email, username, password } = req.body;
 
-  //   Validate field for empty strings / null values
-  if (!email || !username || !password) {
-    return res
-      .status(409)
-      .json({ message: "Please fill in the missing fields!" });
-  }
+//   //   Validate field for empty strings / null values
+//   if (!email || !username || !password) {
+//     return res
+//       .status(409)
+//       .json({ message: "Please fill in the missing fields!" });
+//   }
 
+//   try {
+//     // Check if any admin with the provided email already exists
+//     let adminExistsWithEmail = await AdminModel.findOne({ username });
+//     if (adminExistsWithEmail) {
+//       return res.status(409).json({
+//         message: `An account with username (${username}) already exists`,
+//       });
+//     }
+
+//     // check if admin exists with the username provided
+//     const adminExistsWithUsername = await AdminModel.findOne({ username });
+//     if (adminExistsWithUsername) {
+//       return res.status(409).json({
+//         message: `An account with username (${username}) already exists`,
+//       });
+//     }
+
+//     // If the admin does not exist, hash the password
+//     const hashedPassword = hashPassword(password);
+//     console.log("After hash password:", hashedPassword);
+
+//     // Create a new admin
+//     const admin = new AdminModel({
+//       email,
+//       username,
+//       password: hashedPassword,
+//     });
+
+//     // Save the user to the database
+//     await admin.save();
+
+//     // Return a success message with the new admin created
+//     return res.status(201).json({
+//       message: "Your admin account has been created successufully!",
+//       data: admin,
+//     });
+//   } catch (error) {
+//     res.status(500).json({
+//       message:
+//         "An error occured while we processed your request, please try again",
+//       error: error,
+//     });
+//   }
+// };
+
+export const getChatRooms = async (req, res) => {
   try {
-    // Check if any admin with the provided email already exists
-    let adminExistsWithEmail = await AdminModel.findOne({ username });
-    if (adminExistsWithEmail) {
-      return res.status(409).json({
-        message: `An account with username (${username}) already exists`,
-      });
-    }
-
-    // check if admin exists with the username provided
-    const adminExistsWithUsername = await AdminModel.findOne({ username });
-    if (adminExistsWithUsername) {
-      return res.status(409).json({
-        message: `An account with username (${username}) already exists`,
-      });
-    }
-
-    // If the admin does not exist, hash the password
-    const hashedPassword = hashPassword(password);
-    console.log("After hash password:", hashedPassword);
-
-    // Create a new admin
-    const admin = new AdminModel({
-      email,
-      username,
-      password: hashedPassword,
-    });
-
-    // Save the user to the database
-    await admin.save();
-
-    // Return a success message with the new admin created
-    return res.status(201).json({
-      message: "Your admin account has been created successufully!",
-      data: admin,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message:
-        "An error occured while we processed your request, please try again",
-      error: error,
-    });
-  }
-};
-
-export const getAdminAccounts = async (req, res) => {
-  console.log("OVER HERE");
-  try {
-    // Query database for all admins
-    const admins = await AdminModel.find();
+    // Query database for all chat rooms
+    const chatRooms = await ChatRoomModel.find()
+      .populate("user")
+      .populate("engineer")
+      .populate("project");
     console.log("DOWN HERE");
-    // Return success message with all admins
-    res.status(200).json({ message: "Fetched all admins", data: admins });
+    // Return success message with all chatRooms
+    res.status(200).json({ message: "Fetched all chatRooms", data: chatRooms });
   } catch (error) {
     res.status(500).json({
       message:
@@ -344,10 +346,8 @@ export const assignEngineerToProject = async (req, res) => {
 
     // Assigning engineer and user to a chat room
     // Create chat room
-    const chatRoom = await ChatRoomModel.findOne({
-      user: ownerId,
-      engineer: engineerId,
-      project: projectId,
+    const chatRoom = await ChatRoomModel.find({
+      roomName: `${project.owner.username}-${project.engineerAssigned.email}`,
     });
     if (chatRoom) {
       return res.status(409).json({
@@ -355,9 +355,8 @@ export const assignEngineerToProject = async (req, res) => {
       });
     }
     const newChatRoom = new ChatRoomModel({
-      user: ownerId,
-      engineer: engineerId,
-      project: projectId,
+      roomName: `${project.owner.username}-${project.engineerAssigned.email}`,
+      members: [project.owner._id, project.engineerAssigned._id],
     });
     // save chat room to database
     await newChatRoom.save();

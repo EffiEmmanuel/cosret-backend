@@ -29,6 +29,12 @@ const User = new mongoose.Schema(
         required: false,
       },
     ],
+    chatRooms: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "ChatRoom",
+      },
+    ],
   },
   { timestamps: true }
 );

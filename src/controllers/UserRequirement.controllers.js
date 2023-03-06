@@ -164,6 +164,56 @@ export const getUserRequirementById = async (req, res) => {
   }
 };
 
+export const getURSystemRequirementsByURId = async (req, res) => {
+  // Get user id from request params
+  const { userRequirementId } = req.params;
+  const { userId, projectId } = req.query;
+
+  //   Validate field for empty strings / null values
+  if (!userRequirementId) {
+    return res.status(409).json({
+      message:
+        "A user requirement id must be provided in the request params to perform this operation.",
+    });
+  }
+  //   Validate field for empty strings / null values
+  if (!userId || !projectId) {
+    return res.status(409).json({
+      message:
+        "Both the user id and project id must be provided in the request query to perform this operation.",
+    });
+  }
+
+  try {
+    // Query database for the user requirement
+    const userRequirement = await UserRequirementModel.findOne({
+      _id: userRequirementId,
+      project: projectId,
+      user: userId,
+    }).populate("systemRequirements");
+
+    //   Validate field for empty strings / null values
+    if (!userRequirement) {
+      return req.status(404).json({
+        message: `User requirement does not exist.`,
+      });
+    }
+
+    const systemRequirements = userRequirement.systemRequirements;
+
+    // Return success message with all users
+    res
+      .status(200)
+      .json({ message: "Fetched user requirement", data: systemRequirements });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        "An error occured while we processed your request, please try again",
+      data: null,
+    });
+  }
+};
+
 export const updateUserRequirement = async (req, res) => {
   // Get user id from the request params
   const { userRequirementId } = req.params;
@@ -247,9 +297,20 @@ export const deleteUserRequirement = async (req, res) => {
       });
     }
 
+    let updatedUserRequirements = await UserRequirementModel.find({
+      user: userId,
+      project: projectId,
+    })
+      .populate({
+        path: "systemRequirements",
+        sort: { createdAt: -1 },
+      })
+      .sort({ createdAt: -1 });
+
     // Return a success message
     res.status(201).json({
       message: "User requirement deleted successufully!",
+      data: updatedUserRequirements,
     });
   } catch (error) {
     res.status(500).json({

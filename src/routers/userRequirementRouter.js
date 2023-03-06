@@ -6,6 +6,7 @@ import {
   getUserRequirements,
   getUserRequirementById,
   updateUserRequirement,
+  getURSystemRequirementsByURId,
 } from "../controllers/UserRequirement.controllers.js";
 const userRequirementRouter = express.Router();
 
@@ -19,5 +20,10 @@ userRequirementRouter
   .get(getUserRequirementById)
   .put(updateUserRequirement)
   .delete(deleteUserRequirement);
+
+userRequirementRouter.get(
+  "/:userRequirementId/system-requirements",
+  getURSystemRequirementsByURId
+);
 
 export default userRequirementRouter;

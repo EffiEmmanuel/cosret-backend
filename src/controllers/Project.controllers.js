@@ -196,7 +196,12 @@ export const getUserProjects = async (req, res) => {
     // Check if the project belongs to the provided user
     let userProjects = await ProjectModel.find({
       owner: userId,
-    });
+    })
+      .populate("userRequirements")
+      .populate("systemRequirements")
+      .populate("engineerAssigned")
+      .populate("owner")
+      .sort({ createdAt: -1 });
 
     // Return a success message with the new user created
     res.status(201).json({
