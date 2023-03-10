@@ -41,7 +41,7 @@ const server = http.createServer(app);
 // Establish connection to socket.io
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://cosret-frontend.vercel.app"],
   },
 });
 
