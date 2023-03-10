@@ -6,6 +6,7 @@ import {
   getEngineerById,
   getEngineers,
   loginEngineer,
+  markProjectAsDone,
   updateEngineer,
   verifyToken,
 } from "../controllers/Engineer.controllers.js";
@@ -21,5 +22,6 @@ engineerRouter
 engineerRouter.post("/login", loginEngineer);
 engineerRouter.get("/email/:userEmail", getEngineerByEmail);
 engineerRouter.post("/verifyToken", verifyToken);
+engineerRouter.post("/mark-project-as-done", markProjectAsDone);
 
 export default engineerRouter;

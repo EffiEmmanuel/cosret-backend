@@ -365,12 +365,40 @@ export const assignEngineerToProject = async (req, res) => {
     // Update engineer model to include the chat room
     const engineer = await EngineerModel.findOne({ _id: engineerId });
     engineer.chatRooms.push(newChatRoom?._id);
+    engineer.projectsAssignedTo.push(projectId);
     await engineer.save();
 
     // Update user model to include the chat room
     const user = await UserModel.findOne({ _id: ownerId });
     user.chatRooms.push(newChatRoom?._id);
     await user.save();
+
+    // Update project model to include the chat room
+    const updateProject = await ProjectModel.findOne({
+      _id: projectId,
+      owner: ownerId,
+      engineerAssigned: engineerId,
+    })
+      .populate({
+        path: "userRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate({
+        path: "systemRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate("owner")
+      .populate("engineerAssigned");
+    updateProject.chatRoom = newChatRoom?._id;
+    await updateProject.save();
 
     // return success message
     return res.status(201).json({

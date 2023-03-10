@@ -27,6 +27,10 @@ const Project = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Engineer",
     },
+    chatRoom: {
+      type: mongoose.Types.ObjectId,
+      ref: "ChatRoom",
+    },
     isComplete: {
       type: Boolean,
       default: false,

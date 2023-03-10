@@ -51,9 +51,9 @@ export const createSystemRequirement = async (req, res) => {
     }
 
     // Create a new user requirement
-    const systemRequirement = new UserRequirementModel({
+    const systemRequirement = new SystemRequirementModel({
       requirement,
-      user: engineerId,
+      engineer: engineerId,
       project: projectId,
       userRequirement: userRequirementId,
     });
@@ -76,24 +76,19 @@ export const createSystemRequirement = async (req, res) => {
     addedSystemRequirementToProject?.systemRequirements?.push(
       systemRequirement._id
     );
-    console.log(
-      "PROJECTTTT=====:",
-      addedSystemRequirementToProject?.systemRequirements
-    );
-    await addedSystemRequirementToProject.save();
 
-    console.log("AFTER SAVING REQUIREMENT TO PROJECT");
+    await addedSystemRequirementToProject.save();
 
     // Return a success message with the new user requirement created
     return res.status(201).json({
-      message: "User requirement added successufully!",
+      message: "System requirement added successufully!",
       data: systemRequirement,
     });
   } catch (error) {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      error: error,
+      error: error.message,
     });
   }
 };
@@ -104,7 +99,6 @@ export const getSystemRequirements = async (req, res) => {
     const systemRequirements = await SystemRequirementModel.find()
       .populate("userRequirement")
       .populate("project");
-    console.log("DOWN HERE");
     // Return success message with all user requirements
     res.status(200).json({
       message: "Fetched all system requirements",

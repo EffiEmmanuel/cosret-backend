@@ -2,6 +2,7 @@
 import { jwtSign, jwtVerify } from "../helpers/auth.js";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
 import EngineerModel from "../models/Engineer.models.js";
+import ProjectModel from "../models/Project.models.js";
 
 export const createEngineer = async (req, res) => {
   // Get all fields from the request body
@@ -226,7 +227,9 @@ export const loginEngineer = async (req, res) => {
   }
 
   try {
-    const engineerExists = await EngineerModel.findOne({ email });
+    const engineerExists = await EngineerModel.findOne({ email })
+      .populate("projectsAssignedTo")
+      .populate("chatRooms");
     if (!engineerExists) {
       return res
         .status(404)
@@ -266,7 +269,6 @@ export const verifyToken = async (req, res) => {
   }
 
   const isValid = jwtVerify(token);
-  console.log("ISVALID:", isValid);
   if (Math.floor(new Date().getTime() / 1000) >= isValid.exp * 100) {
     return res.status(403).json({
       message: "Session expired! Please log in.",
@@ -276,5 +278,64 @@ export const verifyToken = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Token still valid.", data: isValid.engineerExists });
+  }
+};
+
+export const markProjectAsDone = async (req, res) => {
+  // Get engineer id and project id from the request query
+  const { engineerId, projectId } = req.query;
+
+  //   Validating fields
+  if (!engineerId || !projectId) {
+    return res.status(409).json({
+      message:
+        "Both an engineer id and project id are needed to perform this operation!",
+    });
+  }
+
+  try {
+    const isEngineerAssignedToProject = ProjectModel.findOneAndUpdate(
+      {
+        _id: projectId,
+        engineerAssigned: engineerId,
+      },
+      { isComplete: true }
+    )
+      .populate({
+        path: "userRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate({
+        path: "systemRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate("owner")
+      .populate("engineerAssigned");
+
+    if (!isEngineerAssignedToProject) {
+      return res.status(403).json({
+        message:
+          "Invalid action! You are trying to make changes to a project that was not assigned to you!",
+      });
+    }
+
+    res.status(201).json({
+      message: "Project successfully marked as complete!",
+      data: isEngineerAssignedToProject,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        "An error occured while we processed your request, please try again",
+      data: error,
+    });
   }
 };

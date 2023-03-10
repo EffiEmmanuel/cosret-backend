@@ -161,7 +161,9 @@ export const getProjectBySlug = async (req, res) => {
             createdAt: -1,
           },
         },
-      });
+      })
+      .populate("owner")
+      .populate("engineerAssigned");
 
     //   Validate field for empty strings / null values
     if (!project) {

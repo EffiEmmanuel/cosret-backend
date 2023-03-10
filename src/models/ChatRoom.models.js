@@ -14,6 +14,12 @@ const ChatRoom = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Project",
     },
+    messages: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
   },
   { timestamps: true }
 );
