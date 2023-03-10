@@ -21,8 +21,13 @@ const app = express();
 // Connect to database
 connectDB();
 
+const corsOptions = {
+  origin: "https://cosret-frontend.vercel.app",
+  optionsSuccessStatus: 200,
+};
+
 // Middewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(urlencoded({ extended: false, limit: "50mb" }));
 app.use(json());
 
