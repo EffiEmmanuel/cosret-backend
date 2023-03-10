@@ -17,18 +17,26 @@ import { createMessage } from "./controllers/Message.controllers.js";
 dotenv.config();
 
 const app = express();
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // Connect to database
 connectDB();
 
-const corsOptions = {
-  origin: "https://cosret-frontend.vercel.app",
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: "https://cosret-frontend.vercel.app",
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
 
 // Middewares
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(urlencoded({ extended: false, limit: "50mb" }));
 app.use(json());
 
