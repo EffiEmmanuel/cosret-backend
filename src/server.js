@@ -23,6 +23,7 @@ connectDB();
 
 const corsOptions = {
   origin: "https://cosret-frontend.vercel.app",
+  credentials: true,
   optionsSuccessStatus: 200,
 };
 
