@@ -19,7 +19,11 @@ dotenv.config();
 const app = express();
 
 // Middewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://corset-frontend.vercel.app",
+  })
+);
 app.use(urlencoded({ extended: false, limit: "50mb" }));
 app.use(json());
 
