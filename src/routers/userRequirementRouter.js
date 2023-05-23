@@ -7,6 +7,7 @@ import {
   getUserRequirementById,
   updateUserRequirement,
   getURSystemRequirementsByURId,
+  getUserRequirementByProjectId,
 } from "../controllers/UserRequirement.controllers.js";
 const userRequirementRouter = express.Router();
 
@@ -22,8 +23,18 @@ userRequirementRouter
   .delete(deleteUserRequirement);
 
 userRequirementRouter.get(
-  "/:userRequirementId/system-requirements",
+  "/:userRequirementId/functional-requirements",
   getURSystemRequirementsByURId
+);
+
+userRequirementRouter.get(
+  "/:userRequirementId/non-functional-requirements",
+  getURSystemRequirementsByURId
+);
+
+userRequirementRouter.get(
+  "/project-requirements/:userId/:projectId",
+  getUserRequirementByProjectId
 );
 
 export default userRequirementRouter;

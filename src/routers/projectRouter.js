@@ -13,7 +13,7 @@ const projectRouter = express.Router();
 projectRouter.route("/").get(getProjects).post(createProject);
 projectRouter
   .route("/:userId/:projectId")
-  .put(updateProject)
+  .patch(updateProject)
   .delete(deleteProject);
 
 projectRouter.get("/user/:userId", getUserProjects);

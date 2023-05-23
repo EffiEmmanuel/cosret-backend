@@ -14,10 +14,16 @@ const UserRequirement = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
-    systemRequirements: [
+    functionalRequirements: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "SystemRequirement",
+        ref: "FunctionalRequirement",
+      },
+    ],
+    nonFunctionalRequirements: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "NonFunctionalRequirement",
       },
     ],
     project: {

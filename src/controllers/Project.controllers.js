@@ -152,14 +152,16 @@ export const getProjectBySlug = async (req, res) => {
           sort: {
             createdAt: -1,
           },
-        },
-      })
-      .populate({
-        path: "systemRequirements",
-        options: {
-          sort: {
-            createdAt: -1,
-          },
+          populate: [
+            {
+              path: "functionalRequirements",
+            },
+          ],
+          populate: [
+            {
+              path: "nonFunctionalRequirements",
+            },
+          ],
         },
       })
       .populate("owner")
@@ -178,7 +180,7 @@ export const getProjectBySlug = async (req, res) => {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      data: null,
+      error: error.message,
     });
   }
 };
@@ -295,10 +297,12 @@ export const deleteProject = async (req, res) => {
       });
     }
 
+    let projects = await EngineerModel.find();
+
     // Return a success message
     res.status(201).json({
       message: "Project has been deleted successufully!",
-      data: project,
+      data: projects,
     });
   } catch (error) {
     res.status(500).json({

@@ -199,10 +199,12 @@ export const deleteEngineer = async (req, res) => {
       });
     }
 
+    let engineers = await EngineerModel.find()
+
     // Return a success message
     res.status(201).json({
       message: "Engineer account deleted successufully!",
-      data: engineer,
+      data: engineers,
     });
   } catch (error) {
     res.status(500).json({

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addStakeholderToProject,
   createUser,
   deleteUser,
   getUserByEmail,
@@ -23,5 +24,6 @@ userRouter.post("/login", loginUser);
 userRouter.post("/verifyToken", verifyToken);
 userRouter.get("/email/:userEmail", getUserByEmail);
 userRouter.get("/username/:username", getUserByUsername);
+userRouter.patch("/:projectId/add-stakeholder", addStakeholderToProject);
 
 export default userRouter;

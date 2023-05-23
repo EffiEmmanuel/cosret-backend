@@ -83,6 +83,27 @@ export const getChatRooms = async (req, res) => {
   }
 };
 
+export const getMessages = async (req, res) => {
+  const { chatRoomId } = req.params;
+  try {
+    // Query database for all chat rooms
+    const chatRooms = await ChatRoomModel.find({ _id: chatRoomId })
+      .populate("messages")
+      .populate("engineer")
+      .populate("project");
+
+    console.log("MESSAGES:", chatRooms?.messages);
+    // Return success message with all chatRooms
+    res.status(200).json({ message: "Fetched all chatRooms", data: chatRooms?.messages });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        "An error occured while we processed your request, please try again",
+      data: null,
+    });
+  }
+};
+
 // export const getAdminById = async (req, res) => {
 //   // Get admin id from request params
 //   const { adminId } = req.params;

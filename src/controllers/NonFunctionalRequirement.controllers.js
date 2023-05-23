@@ -1,9 +1,9 @@
 // @ts-nocheck
 import UserRequirementModel from "../models/UserRequirement.models.js";
 import ProjectModel from "../models/Project.models.js";
-import SystemRequirementModel from "../models/SystemRequirement.models.js";
+import NonFunctionalRequirementModel from "../models/NonFunctionalRequirement.model.js";
 
-export const createSystemRequirement = async (req, res) => {
+export const createNonFunctionalRequirement = async (req, res) => {
   // Get all fields from the request body and request query
   const { engineerId, userRequirementId, projectId } = req.query;
   const { requirement } = req.body;
@@ -37,7 +37,7 @@ export const createSystemRequirement = async (req, res) => {
     }
 
     // check if requirement exists with the details provided
-    const requirementExists = await SystemRequirementModel.findOne({
+    const requirementExists = await NonFunctionalRequirementModel.findOne({
       requirement,
       engineer: engineerId,
       project: projectId,
@@ -46,43 +46,44 @@ export const createSystemRequirement = async (req, res) => {
 
     if (requirementExists) {
       return res.status(409).json({
-        message: `This sustem requirement already exists unde rthe specified user requirement`,
+        message: `This non functional requirement already exists unde rthe specified user requirement`,
       });
     }
 
-    // Create a new user requirement
-    const systemRequirement = new SystemRequirementModel({
+    // Create a new NFR
+    const nonFunctionalRequirement = new NonFunctionalRequirementModel({
       requirement,
       engineer: engineerId,
       project: projectId,
       userRequirement: userRequirementId,
     });
 
-    // Save the userRequirement to the database
-    await systemRequirement.save();
+    // Save the NFR to the database
+    await nonFunctionalRequirement.save();
 
     // TO-DO: Add requirement to project with the same id
-    const addedSystemRequirementToProject = await ProjectModel.findOne({
-      _id: projectId,
-      engineerAssigned: engineerId,
-    });
+    const userRequirement =
+      await UserRequirementModel.findOne({
+        _id: userRequirementId,
+        // project: projectId,
+      });
 
-    if (!addedSystemRequirementToProject) {
+    if (!userRequirement) {
       return res.status(403).json({
         message: `Invalid action! This project does not exist or was not assigned to you!`,
       });
     }
 
-    addedSystemRequirementToProject?.systemRequirements?.push(
-      systemRequirement._id
+    userRequirement?.nonFunctionalRequirements?.push(
+      nonFunctionalRequirement._id
     );
 
-    await addedSystemRequirementToProject.save();
+    await userRequirement.save();
 
-    // Return a success message with the new user requirement created
+    // Return a success message with the new NFR created
     return res.status(201).json({
-      message: "System requirement added successufully!",
-      data: systemRequirement,
+      message: "Non-functional requirement added successufully!",
+      data: nonFunctionalRequirement,
     });
   } catch (error) {
     res.status(500).json({
@@ -93,36 +94,36 @@ export const createSystemRequirement = async (req, res) => {
   }
 };
 
-export const getSystemRequirements = async (req, res) => {
+export const getNonFunctionalRequirements = async (req, res) => {
   try {
     // Query database for all system requirement
-    const systemRequirements = await SystemRequirementModel.find()
+    const nonFunctionalRequirement = await NonFunctionalRequirementModel.find()
       .populate("userRequirement")
       .populate("project");
     // Return success message with all user requirements
     res.status(200).json({
       message: "Fetched all system requirements",
-      data: systemRequirements,
+      data: nonFunctionalRequirement,
     });
   } catch (error) {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      data: null,
+      error: error.message,
     });
   }
 };
 
-export const getSystemRequirementById = async (req, res) => {
+export const getNonFunctionalRequirementById = async (req, res) => {
   // Get user id from request params
-  const { systemRequirementId } = req.params;
+  const { nonFunctionalRequirementId } = req.params;
   const { engineerId, projectId } = req.query;
 
   //   Validate field for empty strings / null values
-  if (!systemRequirementId) {
+  if (!nonFunctionalRequirementId) {
     return res.status(409).json({
       message:
-        "A system requirement id must be provided in the request params to perform this operation.",
+        "A non functional requirement id must be provided in the request params to perform this operation.",
     });
   }
   //   Validate field for empty strings / null values
@@ -135,8 +136,8 @@ export const getSystemRequirementById = async (req, res) => {
 
   try {
     // Query database for the user requirement
-    const systemRequirement = await SystemRequirementModel.findOne({
-      _id: systemRequirementId,
+    const nonFunctionalRequirement = await NonFunctionalRequirementModel.findOne({
+      _id: nonFunctionalRequirementId,
       project: projectId,
       engineer: engineerId,
     })
@@ -144,16 +145,16 @@ export const getSystemRequirementById = async (req, res) => {
       .populate("project");
 
     //   Validate field for empty strings / null values
-    if (!systemRequirement) {
+    if (!nonFunctionalRequirement) {
       return req.status(404).json({
-        message: `User requirement does not exist.`,
+        message: `Non functional requirement does not exist.`,
       });
     }
 
-    // Return success message with all users
+    // Return success message with all NFRs
     res
       .status(200)
-      .json({ message: "Fetched system requirement", data: systemRequirement });
+      .json({ message: "Fetched non-functional requirement", data: nonFunctionalRequirement });
   } catch (error) {
     res.status(500).json({
       message:
@@ -163,16 +164,16 @@ export const getSystemRequirementById = async (req, res) => {
   }
 };
 
-export const updateSystemRequirement = async (req, res) => {
+export const updateNonFunctionalRequirement = async (req, res) => {
   // Get user id from the request params
-  const { systemRequirementId } = req.params;
+  const { nonFunctionalRequirementId } = req.params;
   const { engineerId, projectId } = req.query;
 
   //   Validate field for empty strings / null values
-  if (!systemRequirementId) {
+  if (!nonFunctionalRequirementId) {
     return res.status(409).json({
       message:
-        "A engineer requirement id must be provided in the request params to perform this operation.",
+        "A non-functional requirement id must be provided in the request params to perform this operation.",
     });
   }
   //   Validate field for empty strings / null values
@@ -185,24 +186,30 @@ export const updateSystemRequirement = async (req, res) => {
 
   try {
     // Check if any user with the provided user id exists
-    let systemRequirement = await SystemRequirementModel.findOneAndUpdate(
-      { _id: systemRequirementId, engineer: engineerId, project: projectId },
-      { ...req.body }
-    );
-    if (!systemRequirement) {
+    let nonFunctionalRequirement =
+      await NonFunctionalRequirementModel.findOneAndUpdate(
+        {
+          _id: nonFunctionalRequirementId,
+          engineer: engineerId,
+          project: projectId,
+        },
+        { ...req.body }
+      );
+    if (!nonFunctionalRequirement) {
       return res.status(404).json({
         message: `Invalid operation. This system requirement does not exist!`,
       });
     }
 
-    let updatedSystemRequirement = await SystemRequirementModel.findOne({
-      _id: systemRequirementId,
-    });
+    let updatedFunctionalRequirement =
+      await NonFunctionalRequirementModel.findOne({
+        _id: nonFunctionalRequirementId,
+      });
 
     // Return a success message with the updated system requirement
     res.status(201).json({
-      message: "Your system requirement has been updated!",
-      data: updatedSystemRequirement,
+      message: "Your non-functional requirement has been updated!",
+      data: updatedFunctionalRequirement,
     });
   } catch (error) {
     res.status(500).json({
@@ -213,13 +220,13 @@ export const updateSystemRequirement = async (req, res) => {
   }
 };
 
-export const deleteSystemRequirement = async (req, res) => {
+export const deleteNonFunctionalRequirement = async (req, res) => {
   // Get user id from the request params
-  const { systemRequirementId } = req.params;
+  const { nonFunctionalRequirementId } = req.params;
   const { engineerId, projectId } = req.query;
 
   //   Validate field for empty strings / null values
-  if (!systemRequirementId) {
+  if (!nonFunctionalRequirementId) {
     return res.status(409).json({
       message:
         "A system requirement id must be provided in the request params to perform this operation.",
@@ -235,12 +242,13 @@ export const deleteSystemRequirement = async (req, res) => {
 
   try {
     // Check if any user with the provided email already exists
-    let systemRequirement = await SystemRequirementModel.findOneAndDelete({
-      _id: systemRequirementId,
-      engineer: engineerId,
-      project: projectId,
-    });
-    if (!systemRequirement) {
+    let nonFunctionalRequirement =
+      await NonFunctionalRequirementModel.findOneAndDelete({
+        _id: nonFunctionalRequirementId,
+        engineer: engineerId,
+        project: projectId,
+      });
+    if (!nonFunctionalRequirement) {
       return res.status(403).json({
         message: "Invalid action! This project does not belong to you.",
       });
@@ -248,7 +256,7 @@ export const deleteSystemRequirement = async (req, res) => {
 
     // Return a success message
     res.status(201).json({
-      message: "System requirement deleted successufully!",
+      message: "Non-Functional requirement deleted successufully!",
     });
   } catch (error) {
     res.status(500).json({

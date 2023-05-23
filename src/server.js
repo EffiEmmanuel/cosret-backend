@@ -10,9 +10,12 @@ import engineerRouter from "./routers/EngineerRouter.js";
 import adminRouter from "./routers/AdminRouter.js";
 import projectRouter from "./routers/ProjectRouter.js";
 import userRequirementRouter from "./routers/UserRequirementRouter.js";
-import systemRequirementRouter from "./routers/SystemRequirementRouter.js";
+import systemRequirementRouter from "./routers/functionalRequirementRouter.js";
 import messageRouter from "./routers/MessageRouter.js";
 import { createMessage } from "./controllers/Message.controllers.js";
+import functionalRequirementRouter from "./routers/functionalRequirementRouter.js";
+import nonFunctionalRequirementRouter from "./routers/nonFunctionalRequirementRouter.js";
+import chatRoomRouter from "./routers/chatRoomRouter.js";
 
 dotenv.config();
 
@@ -21,7 +24,7 @@ const app = express();
 // Middewares
 app.use(
   cors({
-    origin: "https://corset-frontend.vercel.app",
+    origin: "*",
   })
 );
 app.use(urlencoded({ extended: false, limit: "50mb" }));
@@ -36,8 +39,10 @@ app.use("/api/engineers", engineerRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/projects", projectRouter);
 app.use("/api/user-requirements", userRequirementRouter);
-app.use("/api/system-requirements", systemRequirementRouter);
+app.use("/api/functional-requirements", functionalRequirementRouter);
+app.use("/api/non-functional-requirements", nonFunctionalRequirementRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/chatrooms", chatRoomRouter);
 
 // Creating the server
 const server = http.createServer(app);
@@ -45,12 +50,13 @@ const server = http.createServer(app);
 // Establish connection to socket.io
 const io = new Server(server, {
   cors: {
+    origin: "*",
     // origin: ["http://localhost:3000", "https://cosret-frontend.vercel.app"],
-    origin: [
-      "https://cosret-frontend.vercel.app",
-      "https://cosret-frontend-effiemmanuel.vercel.app",
-      "https://cosret-frontend-git-main-effiemmanuel.vercel.app",
-    ],
+    // origin: [
+    //   "https://cosret-frontend.vercel.app",
+    //   "https://cosret-frontend-effiemmanuel.vercel.app",
+    //   "https://cosret-frontend-git-main-effiemmanuel.vercel.app",
+    // ],
   },
 });
 

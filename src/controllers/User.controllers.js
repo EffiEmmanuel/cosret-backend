@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { jwtSign, jwtVerify } from "../helpers/auth.js";
 import { hashPassword, comparePassword } from "../helpers/bcrypt.js";
+import ProjectModel from "../models/Project.models.js";
 import UserModel from "../models/user.models.js";
 
 export const createUser = async (req, res) => {
@@ -250,10 +251,12 @@ export const deleteUser = async (req, res) => {
       });
     }
 
+    let users = await UserModel.find()
+
     // Return a success message
     res.status(201).json({
       message: "User account deleted successufully!",
-      data: user,
+      data: users,
     });
   } catch (error) {
     res.status(500).json({
@@ -304,7 +307,7 @@ export const loginUser = async (req, res) => {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      data: error,
+      error: error,
     });
   }
 };
@@ -323,5 +326,42 @@ export const verifyToken = async (req, res) => {
     return res
       .status(200)
       .json({ message: "Token still valid.", data: isValid.userExists });
+  }
+};
+
+export const addStakeholderToProject = async (req, res) => {
+  // Get username from req params
+  const { projectId } = req.params;
+  const { email } = req.body
+
+  if (!email)
+    return res.status(404).json({ message: "A email must be provided." });
+
+  try {
+    const project = await ProjectModel.findOne({ _id: projectId });
+    const stakeholder = project.stakeholders.filter((stakeholder) => {
+      return stakeholder.email === email;
+    });
+    if (stakeholder) {
+      return res.status(403).json({
+        message:
+          "Invalid action. Stakeholder has already been added to project.",
+      });
+    }
+
+    project.stakeholders.push(email);
+
+    await project.save();
+
+    res.status(201).json({
+      message: "Stakeholder has been added to the project",
+      data: project,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        "An error occured while we processed your request, please try again",
+      error: error,
+    });
   }
 };

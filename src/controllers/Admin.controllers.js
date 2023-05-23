@@ -387,14 +387,6 @@ export const assignEngineerToProject = async (req, res) => {
           },
         },
       })
-      .populate({
-        path: "systemRequirements",
-        options: {
-          sort: {
-            createdAt: -1,
-          },
-        },
-      })
       .populate("owner")
       .populate("engineerAssigned");
     updateProject.chatRoom = newChatRoom?._id;

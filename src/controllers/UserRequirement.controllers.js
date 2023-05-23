@@ -142,7 +142,23 @@ export const getUserRequirementById = async (req, res) => {
       _id: userRequirementId,
       project: projectId,
       user: userId,
-    }).populate("systemRequirements");
+    })
+      .populate({
+        path: "nonFunctionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate({
+        path: "functionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      });
 
     //   Validate field for empty strings / null values
     if (!userRequirement) {
@@ -160,6 +176,61 @@ export const getUserRequirementById = async (req, res) => {
       message:
         "An error occured while we processed your request, please try again",
       data: null,
+    });
+  }
+};
+
+export const getUserRequirementByProjectId = async (req, res) => {
+  // Get user id from request params
+  const { userId, projectId } = req.params;
+
+  //   Validate field for empty strings / null values
+  if (!userId || !projectId) {
+    return res.status(409).json({
+      message:
+        "Both the user id and project id must be provided in the request query to perform this operation.",
+    });
+  }
+
+  try {
+    // Query database for the user requirement
+    const userRequirement = await UserRequirementModel.find({
+      project: projectId,
+      user: userId,
+    })
+      .populate({
+        path: "nonFunctionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate({
+        path: "functionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      });
+
+    //   Validate field for empty strings / null values
+    if (!userRequirement) {
+      return req.status(404).json({
+        message: `User requirement does not exist.`,
+      });
+    }
+
+    // Return success message with all users
+    res
+      .status(200)
+      .json({ message: "Fetched project requirement", data: userRequirement });
+  } catch (error) {
+    res.status(500).json({
+      message:
+        "An error occured while we processed your request, please try again",
+      error: error.message,
     });
   }
 };
@@ -190,7 +261,23 @@ export const getURSystemRequirementsByURId = async (req, res) => {
       _id: userRequirementId,
       project: projectId,
       user: userId,
-    }).populate("systemRequirements");
+    })
+      .populate({
+        path: "nonFunctionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      })
+      .populate({
+        path: "functionalRequirements",
+        options: {
+          sort: {
+            createdAt: -1,
+          },
+        },
+      });
 
     //   Validate field for empty strings / null values
     if (!userRequirement) {
@@ -199,17 +286,17 @@ export const getURSystemRequirementsByURId = async (req, res) => {
       });
     }
 
-    const systemRequirements = userRequirement.systemRequirements;
+    // const systemRequirements = userRequirement.systemRequirements;
 
     // Return success message with all users
     res
       .status(200)
-      .json({ message: "Fetched user requirement", data: systemRequirements });
+      .json({ message: "Fetched user requirement", data: userRequirement });
   } catch (error) {
     res.status(500).json({
       message:
         "An error occured while we processed your request, please try again",
-      data: null,
+      error: error.message,
     });
   }
 };

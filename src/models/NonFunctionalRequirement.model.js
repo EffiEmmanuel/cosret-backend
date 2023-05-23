@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const SystemRequirement = new mongoose.Schema(
+const NonFunctionalRequirement = new mongoose.Schema(
   {
     requirement: {
       type: String,
@@ -22,8 +22,8 @@ const SystemRequirement = new mongoose.Schema(
   { timestamps: true }
 );
 
-const SystemRequirementModel = mongoose.model(
-  "SystemRequirement",
-  SystemRequirement
+const NonFunctionalRequirementModel = mongoose.model(
+  "NonFunctionalRequirement",
+  NonFunctionalRequirement
 );
-export default SystemRequirementModel;
+export default NonFunctionalRequirementModel;

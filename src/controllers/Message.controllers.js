@@ -63,9 +63,10 @@ export const getChatRoomMessages = async (req, res) => {
     }).populate({
       path: "sender",
     });
-    // const chatRoom = await ChatRoomModel.findById(chatRoomId);
 
-    console.log("CR:", messages);
+    const chatRoom = await ChatRoomModel.findById(chatRoomId);
+
+    console.log("CRRRRRRRRR:", chatRoom);
 
     if (!messages) {
       return res

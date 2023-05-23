@@ -10,6 +10,12 @@ const ChatRoom = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Engineer",
     },
+    // stakeholders: [
+    //   {
+    //     type: mongoose.Types.ObjectId,
+    //     ref: "Stakeholder",
+    //   },
+    // ],
     project: {
       type: mongoose.Types.ObjectId,
       ref: "Project",

@@ -41,10 +41,9 @@ const Project = new mongoose.Schema(
         ref: "UserRequirement",
       },
     ],
-    systemRequirements: [
+    stakeholders: [
       {
-        type: mongoose.Types.ObjectId,
-        ref: "SystemRequirement",
+        type: String,
       },
     ],
   },
